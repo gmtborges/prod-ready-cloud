@@ -13,6 +13,10 @@ import (
 
 func main() {
 	e := echo.New()
+	e.GET("/health", func(c echo.Context) error {
+		// Validate required connections...
+		return c.String(http.StatusOK, "ok")
+	})
 	e.GET("/hello", handlerHello)
 
 	terminationCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
