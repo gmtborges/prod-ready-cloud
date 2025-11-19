@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
+	"strings"
 	"syscall"
 	"time"
 
@@ -18,6 +21,7 @@ func main() {
 		return c.String(http.StatusOK, "ok")
 	})
 	e.GET("/", handlerHello)
+	e.GET("/:name", handlerHello)
 
 	terminationCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -37,6 +41,17 @@ func main() {
 }
 
 func handlerHello(c echo.Context) error {
-	time.Sleep(3 * time.Second) // Test graceful shutdown
-	return c.String(http.StatusOK, "Hello, SREday!")
+	// time.Sleep(3 * time.Second) // Test graceful shutdown
+	name := c.Param("name")
+	nameRegex := regexp.MustCompile(`^[a-zA-Z]{2,20}$`)
+
+	if name == "" {
+		return c.String(http.StatusOK, "Hello, SREday!")
+	}
+
+	if !nameRegex.MatchString(name) {
+		return c.String(http.StatusBadRequest, "Invaid name.")
+	}
+
+	return c.String(http.StatusOK, fmt.Sprintf("Hello, %s!", strings.ToUpper(name[0:1])+name[1:]))
 }
