@@ -37,6 +37,6 @@ func main() {
 }
 
 func handlerHello(c echo.Context) error {
-	time.Sleep(3 * time.Second) // Test graceful shutdown
+	// time.Sleep(3 * time.Second) // Test graceful shutdown
 	return c.String(http.StatusOK, "Hello, SREday!")
 }
