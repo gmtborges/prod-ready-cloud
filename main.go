@@ -42,6 +42,7 @@ func main() {
 	shutdownTraceProvider, err := initTracerProvider(terminationCtx)
 
 	e := echo.New()
+	port := os.Getenv("PORT")
 	serviceName := os.Getenv("OTEL_SERVICE_NAME")
 	e.Use(otelecho.Middleware(serviceName))
 
@@ -53,7 +54,7 @@ func main() {
 	e.GET("/:name", handlerHello)
 
 	go func() {
-		if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":" + port); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Err(err).Msg("shutting down the server...")
 		}
 	}()
