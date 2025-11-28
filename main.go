@@ -12,9 +12,11 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
+	"golang.org/x/time/rate"
 )
 
 func main() {
@@ -43,6 +45,7 @@ func main() {
 	port := os.Getenv("PORT")
 	serviceName := os.Getenv("OTEL_SERVICE_NAME")
 	e.Use(otelecho.Middleware(serviceName))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(5))))
 
 	e.GET("/health", func(c echo.Context) error {
 		// Validate required connections...
