@@ -4,6 +4,7 @@ FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 RUN apk add --no-cache git
+RUN adduser --disabled-password --uid 1000 appuser
 
 WORKDIR /build
 COPY go.mod go.sum ./
@@ -19,6 +20,10 @@ COPY --from=builder /usr/bin/wget /bin/wget
 COPY --from=builder /etc/ssl/certs/ /etc/ssl/certs/
 COPY --from=builder /lib/ld-musl-* /lib/
 COPY --from=builder /lib/libc.* /lib/
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+USER appuser
 
 ENV PORT=8080
 HEALTHCHECK --interval=5s --timeout=3s \
